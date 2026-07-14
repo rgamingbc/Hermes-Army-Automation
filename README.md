@@ -139,6 +139,20 @@ hermes -s hermes-startup-handover
 - Obsidian vault 只記索引（`System/Assistant/secrets-index.md`），唔記值。
 - 詳情見 [`LOCAL-SECRETS.md`](LOCAL-SECRETS.md)。
 
+## gbrain resolver / manifest
+
+本 repo 嘅 skills 自帶 `skills/RESOLVER.md` 同 `skills/manifest.json`，用嚟讓 gbrain 正確解析呢啲 skill。
+
+- 如果 `~/.hermes/skills/` 已經有 `RESOLVER.md`，`./install-skills.sh` 會自動備份，然後用 repo 版本覆蓋。
+- 如果你有大量 gbrain skill routing（例如 `gbrain/*`、`computer-use`、`dogfood`、`yuanbao`），建議合併而非覆蓋。可以參考 `templates/RESOLVER-full.md`。
+- 安裝後驗證：
+  ```bash
+  cd ~
+  gbrain check-resolvable --json
+  gbrain doctor --json
+  ```
+- 預期結果：`check-resolvable` 0 errors；`gbrain doctor` status `warnings`、health score 約 65（PGLite 引擎限制 + 未啟用 embedding / retrieval-reflex 等可選功能）。
+
 ## 客製化
 
 - 修改 `skills/` 入面嘅 SKILL.md 後，重新執行 `./install-skills.sh` 即可同步到 `~/.hermes/skills/`。
