@@ -49,7 +49,7 @@ If it does not exist, create it using the `hermes-setup-checklist` skill templat
 Verify the critical tools are still healthy:
 - Hermes WebUI: `curl -s http://127.0.0.1:8789/health`
 - agentic-stack: `python3 ~/.hermes/.agent/tools/show.py`
-- gbrain: `gbrain doctor --json`
+- gbrain: `export PATH="$HOME/.bun/bin:$PATH" && gbrain doctor --json`
 - repomix: `~/.hermes/bin/repomix --version`
 - Vision: `grep -n "auxiliary.vision" ~/.hermes/config.yaml`
 

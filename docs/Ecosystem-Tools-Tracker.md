@@ -21,9 +21,9 @@ type: tracker
 | **agentic-stack** | ✅ 已整合 | `~/.hermes/.agent/` | `python3 ~/.hermes/.agent/tools/show.py` | Portable brain layer |
 | **awesome-hermes-agent** | ✅ 已複製 | `~/.hermes/tools/awesome-hermes-agent` | `ls ~/.hermes/tools/awesome-hermes-agent` | Resource collection |
 | **hermes-agent-self-evolution** | ✅ 已安裝 | `~/.hermes/tools/hermes-agent-self-evolution` | `python3.11 -c "import evolution; print('OK')"` | DSPy + GEPA optimizer |
-| **gbrain** | ✅ 已 init | `~/.gbrain` | `gbrain doctor --json` | Health score 65, PGLite, keyword-only mode |
+| **gbrain** | ⚠️ 可用但 unhealthy | `~/.gbrain` | `export PATH="$HOME/.bun/bin:$PATH" && gbrain doctor --json` | Health score 40，PGLite，keyword-only mode；resolver_health fail，manifest.json 未建立；**預設 PATH 未載入 `.bun/bin`** |
 | **repomix** | ✅ 已安裝 | `~/.hermes/tools/repomix` | `~/.hermes/bin/repomix --version` | v1.16.1，已入 PATH via `~/.hermes/bin` |
-| **Vision 修復** | ✅ 已設定 | `~/.hermes/config.yaml` auxiliary.vision | `grep -n vision ~/.hermes/config.yaml` | 使用 Kimi OpenAI endpoint |
+| **Vision 修復** | ✅ 已設定 | `~/.hermes/config.yaml` 第 167 行 | `grep -n "vision" ~/.hermes/config.yaml` | 使用 Kimi OpenAI endpoint |
 
 ---
 
@@ -87,7 +87,7 @@ type: tracker
 ### 2.7 gbrain
 
 - 位置：`~/.gbrain`
-- 狀態：✅ 已 init（health score 65）
+- 狀態：⚠️ 可用但 unhealthy（health score 40）
 - 驗證：
   ```bash
   export PATH="$HOME/.bun/bin:$PATH"
@@ -95,7 +95,9 @@ type: tracker
   ```
 - 注意：
   - 使用 PGLite，keyword-only mode（未設 embedding API key）
-  - 有若干 warning：no embeddings、pgvector、retrieval-reflex 未 install，屬正常
+  - 主要問題：`resolver_health` fail（建議建立 `skills/RESOLVER.md` 或為每個 SKILL.md 加 `triggers:`）、`manifest.json` 未建立
+  - 其他 warning：no embeddings、pgvector、retrieval-reflex 未 install、pack upgrade 可用，屬正常可選項目
+  - **預設 PATH 未載入 `.bun/bin`，驗證前必須先 `export PATH`。**
   - 如要 semantic search，需設定 `ZEROENTROPY_API_KEY` 或 OpenAI/Voyage key
 
 ### 2.8 repomix
@@ -114,7 +116,7 @@ type: tracker
 
 ### 2.9 Vision 修復
 
-- 設定位置：`~/.hermes/config.yaml` 第 159-165 行
+- 設定位置：`~/.hermes/config.yaml` 第 167 行
 - 狀態：✅ 已設定
 - 設定內容：
   ```yaml
@@ -130,6 +132,10 @@ type: tracker
   ```bash
   grep -n "vision" ~/.hermes/config.yaml
   ```
+  或
+  ```bash
+  grep -n "auxiliary.vision" ~/.hermes/config.yaml
+  ```
 - 注意：API key 來自 `~/.hermes/.env` 嘅 `KIMI_API_KEY`。`auth.json` 亦有 credential pool entry。
 
 ---
@@ -141,6 +147,9 @@ type: tracker
 | gbrain embedding key 未設定 | 低 | 可選 | keyword-only mode 可用，semantic search 需要 key |
 | gbrain retrieval-reflex 未 install | 低 | 可選 | 需要時再裝 |
 | gbrain pgvector warning | 低 | PGLite 正常 | PGLite 無獨立 pgvector 插件 |
+| gbrain PATH 未載入 `.bun/bin` | 中 | 未修復 | 驗證時要先 export PATH；下次開工決定是否將 `~/.bun/bin` 加入預設 PATH |
+| gbrain resolver_health fail | 中 | 未修復 | 下次開工決定是否建立 RESOLVER.md 或加 triggers |
+| gbrain skill_conformance warning | 低 | 未修復 | manifest.json 未建立，可選 |
 
 ---
 
@@ -148,7 +157,7 @@ type: tracker
 
 開工時：
 - [ ] Hermes WebUI health check 過到
-- [ ] gbrain doctor 無紅色 error
+- [ ] gbrain doctor 無紅色 error（記得先 export PATH）
 - [ ] repomix 版本正常
 - [ ] 必要時測試一張圖 vision_analyze
 
@@ -164,6 +173,10 @@ type: tracker
 |------|------|--------|
 | 2026-07-14 | 建立 tracker，確認所有工具已安裝並記錄實際狀態 | Hermes |
 | 2026-07-14 | 正式把 repomix 由 `/tmp/repomix` 遷移到 `~/.hermes/tools/repomix` 並入 PATH | Hermes |
+| 2026-07-14 | 更新 gbrain 狀態：health score 65→40，resolver_health fail，manifest.json 未建立 | Hermes |
+| 2026-07-14 | 更新 Vision 設定行數為 167，驗證指令加入 `grep -n "auxiliary.vision"` | Hermes |
+| 2026-07-14 | 收工驗證：Hermes WebUI/agentic-stack/agent-browser/repomix/ponytail 正常；gbrain 需先 export PATH；Vision 位於第 5 同 167 行 | Hermes |
+| 2026-07-14 | 更新 tracker：gbrain 驗證需要載入 `.bun/bin` PATH，加入 gbrain PATH 未載入問題 | Hermes |
 
 ---
 
