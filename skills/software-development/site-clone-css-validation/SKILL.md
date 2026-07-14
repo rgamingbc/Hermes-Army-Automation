@@ -27,9 +27,17 @@ in the `wild91-casino-saas` repo, §"v3 更新" box + §A (Homepage) + §B (In-P
 
 ## Tool choice
 
-Follow the active browser policy:
-- **Deterministic / known flow** (known URL, known clicks, known assertions) → use the native Playwright-based `webapp-testing` skill.
-- **Open-ended exploration** (unknown page structure, need to map UI) → use `agent-browser`.
+The general policy is:
+- **Deterministic / known flow** (known URL, known clicks, known assertions, no human-in-the-loop) → the native Playwright-based `webapp-testing` skill.
+- **Open-ended exploration** (unknown page structure, need to map UI) → `agent-browser`.
+
+**But for this skill's Capture phase specifically, default to `agent-browser`, not Playwright — even though "open two known URLs and screenshot" sounds like a deterministic flow.** Three reasons, all learned the hard way on real captures against auth-gated production sites (e.g. Crown):
+
+1. **Human-typed login mid-session.** The old/target site is very often behind a real login that only the human may type (never type a real password yourself, even if you know it from an old script or doc). That means the flow is: open a **headed, human-visible** window → human types credentials in the terminal-visible browser → agent resumes issuing commands. `agent-browser --headed` supports this directly (a real OS-level Chrome window the human can click into); a Playwright script run via `webapp-testing` is built to execute start-to-finish in one round-trip and does not naturally support "pause here for a human, then resume in a later tool call."
+2. **Long-lived session across many sequential commands.** A real capture pass issues dozens of commands over an extended session (navigate, set viewport, screenshot, `eval` for DOM measurement, navigate again, repeat for each region) — sometimes across many separate tool-call turns. `agent-browser`'s tab model (`tab list` / `tab <id>`) keeps a persistent, addressable browser session alive across all of that. A one-shot Playwright script re-launches fresh each run and loses that continuity (and would re-trigger the site's login/logout quirks on every relaunch — e.g. Crown logs out on any root-URL navigation, so a script that has to reload from scratch each time is actively harmful here).
+3. **Real, inspectable screenshot file paths.** `agent-browser screenshot <path>` writes to a real path on disk that can be re-opened, cropped, and pixel-sampled (see the `--full` void-artifact pitfall in §6, which was only caught by scripting a corner-pixel scan over the saved PNG). Some other in-app browser tools do not expose a writable screenshot path at all.
+
+Playwright still has a real job in this skill: **§5 report generation, PDF printing of the *finished* HTML report only** — never for site interaction, capture, or login (§6 pitfall, unchanged from v1). If a capture target is a same-origin/no-login page with no human-in-the-loop requirement (e.g. the new/cloned site itself, once you're already past any auth wall), Playwright is fine there — the constraint above is specifically about the auth-gated/long-session side of the comparison.
 
 Never switch tools mid-task without a clear reason, and never use a tool that contradicts the user's explicit instruction.
 
