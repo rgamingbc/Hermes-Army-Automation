@@ -43,27 +43,41 @@ Look for any of these signals:
 
 If no project is identified, ask the user: "老公，你想我繼續邊個 project？"
 
-## 2. Read the Ecosystem Tools Tracker
+## 2. Read the Ecosystem Tools Tracker (with PATH fix)
 
 Read the canonical tracker from the Obsidian vault:
 - `~/Documents/Hermes Vault/Work/Projects/Hermes Agent Setup/Ecosystem Tools Tracker.md`
 
 If it does not exist, create it using the `hermes-setup-checklist` skill template.
 
+Before running the health checks, source `~/.hermes/.env` so that tools installed outside the system PATH (e.g., `gbrain`, `bun`) are discoverable:
+
+```bash
+set -a && source ~/.hermes/.env && set -a
+```
+
+If `~/.hermes/.env` does not include `~/.bun/bin`, append it during the setup phase and warn the user to run the setup checklist.
+
 Verify the critical tools are still healthy:
 - Hermes WebUI: `curl -s http://127.0.0.1:8789/health`
 - agentic-stack: `python3 ~/.hermes/.agent/tools/show.py`
-- gbrain: `export PATH="$HOME/.bun/bin:$PATH" && gbrain doctor --json`
+- gbrain PATH: `grep -n "^PATH=" ~/.hermes/.env` — must include `$HOME/.bun/bin`
+- gbrain: `gbrain doctor --json` (if command not found, fall back to `export PATH="$HOME/.bun/bin:$PATH" && gbrain doctor --json`)
 - repomix: `~/.hermes/bin/repomix --version`
 - Vision: `grep -n "auxiliary.vision" ~/.hermes/config.yaml`
 
 If any tool status has changed, note it for the shutdown update.
 
-## 3. Read the project handover
+## 3. Read the project handover and the secrets index
 
 Use `read_file` to read the project's handover file. Common locations:
 - `~/Documents/Hermes Vault/Work/Projects/<Project Name> Hermes Handover.md`
 - `~/Documents/Hermes Vault/Work/Projects/<project-folder>/README.md`
+
+Also read the secrets index:
+- `~/Documents/Hermes Vault/System/Assistant/secrets-index.md`
+
+If the handover references a stored credential (e.g., `CROWN_M473_*`), verify that the variable exists in `~/.hermes/.env`. If it is missing, tell the user immediately: "老公，舊站 creds 搵唔到，要你再俾一次。"
 
 If the handover file does not exist, create it using the `hermes-shutdown-handover` skill template and inform the user.
 

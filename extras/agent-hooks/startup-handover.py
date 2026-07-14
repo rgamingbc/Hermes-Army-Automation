@@ -32,6 +32,10 @@ extra = payload.get("extra", {})
 if not extra.get("is_first_turn"):
     _skip()
 
+platform = extra.get("platform", "")
+if platform not in {"cli", "telegram"}:
+    _skip()
+
 home = os.environ.get("HERMES_HOME", os.path.expanduser("~/.hermes"))
 skill_path = os.path.join(home, "skills", "productivity", "hermes-startup-handover", "SKILL.md")
 if not os.path.exists(skill_path):

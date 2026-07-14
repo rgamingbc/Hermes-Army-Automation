@@ -131,6 +131,13 @@ hermes -s hermes-startup-handover
 1. 複製 `extras/agent-hooks/*.py` 到 `~/.hermes/agent-hooks/`。
 2. 喺 `~/.hermes/config.yaml` 加入 `hooks:` 區塊，指向絕對路徑。
 3. 設定 `hooks_auto_accept: true`（非 TTY 環境必需）。
+4. 預設只喺 `cli` 同 `telegram` platform 觸發，避免 cron / tool session 燒 token。
+
+## Secret 管理
+
+- 所有 secret 嘅值統一擺喺 `~/.hermes/.env`。
+- Obsidian vault 只記索引（`System/Assistant/secrets-index.md`），唔記值。
+- 詳情見 [`LOCAL-SECRETS.md`](LOCAL-SECRETS.md)。
 
 ## 客製化
 

@@ -30,7 +30,14 @@ This is a **global** skill. **Run automatically at the end of every working sess
 
 ## User expectation (learned from correction)
 
-The user expects shutdown to be automatic and comprehensive. If a secret (e.g., site credentials) was used during the session, the shutdown routine must ensure it is stored in the agreed durable location and reflected in the handover. If the user later says the credential was lost, it means the previous shutdown failed to record it. Treat secrets used during the session as mandatory handover items, not optional memory. When the user says credentials are to be "記住" / saved, persist them in the agreed secure store (e.g., macOS Keychain, `.hermes/.env`, or a vault file if the user explicitly allows) and record the storage location in the handover. "不寫入檔案" only applies when the user has explicitly forbidden it.
+The user expects shutdown to be automatic and comprehensive. If a secret (e.g., site credentials) was used during the session, the shutdown routine must ensure it is stored in the agreed durable location and reflected in the handover.
+
+**Unified secret storage rule:**
+- All secrets are stored in `~/.hermes/.env`.
+- The Obsidian vault only stores an **index** (name + location), never the secret value.
+- Do NOT use macOS Keychain unless the user explicitly asks for it.
+
+If the user says credentials are to be "記住" / saved, write them to `~/.hermes/.env` and update `~/Documents/Hermes Vault/System/Assistant/secrets-index.md` with the variable name and what it is for. Record the storage location in the project handover. "不寫入檔案" only applies when the user has explicitly forbidden it.
 
 ## 1. Identify the active project
 
@@ -61,7 +68,8 @@ Do NOT copy the project handover file into the repo; the handover stays in the O
 Key verification commands:
 - Hermes WebUI: `curl -s http://127.0.0.1:8789/health`
 - agentic-stack: `python3 ~/.hermes/.agent/tools/show.py`
-- gbrain: `export PATH="$HOME/.bun/bin:$PATH" && gbrain doctor --json`
+- gbrain PATH: `grep -n "^PATH=" ~/.hermes/.env` — must include `$HOME/.bun/bin`
+- gbrain: `gbrain doctor --json` (if command not found, fall back to `export PATH="$HOME/.bun/bin:$PATH" && gbrain doctor --json`)
 - repomix: `~/.hermes/bin/repomix --version`
 - Vision: `grep -n "auxiliary.vision" ~/.hermes/config.yaml`
 

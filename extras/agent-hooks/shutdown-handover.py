@@ -24,9 +24,14 @@ if os.environ.get("HERMES_SHUTDOWN_HANDOVER"):
     _skip()
 
 try:
-    json.load(sys.stdin)
+    payload = json.load(sys.stdin)
 except Exception:
-    pass
+    payload = {}
+
+extra = payload.get("extra", {})
+platform = extra.get("platform", "")
+if platform not in {"cli", "telegram"}:
+    _skip()
 
 home = os.environ.get("HERMES_HOME", os.path.expanduser("~/.hermes"))
 skill_path = os.path.join(home, "skills", "productivity", "hermes-shutdown-handover", "SKILL.md")

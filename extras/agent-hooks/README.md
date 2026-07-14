@@ -69,10 +69,11 @@ hermes hooks test pre_llm_call --payload-file /tmp/first-turn.json
 
 成功會見到一段注入嘅 startup handover context。
 
-## 防 recursion 機制
+## 防 recursion 同平台限制
 
 - `shutdown-handover.py` 會設定 `HERMES_SHUTDOWN_HANDOVER=1`，避免子 session 再次觸發 shutdown hook。
 - 同時設定 `HERMES_STARTUP_HANDOVER=skip`，避免子 session 觸發 startup hook。
+- 兩個 script 都會檢查 `extra.platform`，只喺 `cli` 或 `telegram` 觸發，cron / tool / 其他 source 會自動 skip，避免燒 token。
 
 ## 注意
 
