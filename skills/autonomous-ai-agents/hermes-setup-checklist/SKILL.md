@@ -6,6 +6,12 @@ description: |
   gateway are configured before real work begins.
 version: 1.0.0
 platforms: [linux, macos, windows]
+triggers:
+  - setup checklist
+  - hermes setup
+  - onboard profile
+  - new profile
+  - team setup
 metadata:
   hermes:
     tags: [setup, onboarding, checklist, profile, team]

@@ -1,7 +1,17 @@
 ---
 name: obsidian
 description: Read, search, create, and edit notes in the Obsidian vault.
+version: 1.0.0
 platforms: [linux, macos, windows]
+triggers:
+  - obsidian
+  - vault note
+  - read note
+  - edit note
+  - create note
+metadata:
+  hermes:
+    tags: [obsidian, notes, vault, note-taking]
 ---
 
 # Obsidian Vault

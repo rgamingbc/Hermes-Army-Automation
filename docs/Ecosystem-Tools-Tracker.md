@@ -21,7 +21,7 @@ type: tracker
 | **agentic-stack** | ✅ 已整合 | `~/.hermes/.agent/` | `python3 ~/.hermes/.agent/tools/show.py` | Portable brain layer |
 | **awesome-hermes-agent** | ✅ 已複製 | `~/.hermes/tools/awesome-hermes-agent` | `ls ~/.hermes/tools/awesome-hermes-agent` | Resource collection |
 | **hermes-agent-self-evolution** | ✅ 已安裝 | `~/.hermes/tools/hermes-agent-self-evolution` | `python3.11 -c "import evolution; print('OK')"` | DSPy + GEPA optimizer |
-| **gbrain** | ⚠️ 可用但 unhealthy | `~/.gbrain` | `gbrain doctor --json` | Health score 40；PATH 已修復；resolver_health fail、manifest.json 未建立 |
+| **gbrain** | ⚠️ warnings（resolver 已修復） | `~/.gbrain` | `gbrain doctor --json` | Health score 65；resolver_health ✅；skill_conformance ✅；剩餘 warnings 全部可選 |
 | **repomix** | ✅ 已安裝 | `~/.hermes/tools/repomix` | `~/.hermes/bin/repomix --version` | v1.16.1，已入 PATH via `~/.hermes/bin` |
 | **Vision 修復** | ✅ 已設定 | `~/.hermes/config.yaml` 第 167 行 | `grep -n "vision" ~/.hermes/config.yaml` | 使用 Kimi OpenAI endpoint |
 
@@ -87,16 +87,24 @@ type: tracker
 ### 2.7 gbrain
 
 - 位置：`~/.gbrain`
-- 狀態：⚠️ 可用但 unhealthy（health score 40）
+- 狀態：⚠️ `warnings`（health score **65**）
 - 驗證：
   ```bash
   gbrain doctor --json
+  gbrain check-resolvable --json
   ```
 - 注意：
   - `~/.hermes/.env` 已加入 `~/.bun/bin`，PATH 問題已修復。
-  - 主要問題：`resolver_health` fail（建議建立 `skills/RESOLVER.md` 或為每個 SKILL.md 加 `triggers:`）、`manifest.json` 未建立
-  - 其他 warning：no embeddings、pgvector、retrieval-reflex 未 install、pack upgrade 可用，屬正常可選項目
-  - 如要 semantic search，需設定 `ZEROENTROPY_API_KEY` 或 OpenAI/Voyage key
+  - `~/.hermes/skills/RESOLVER.md` 已修正：移除不存在嘅引用、補齊實際路徑（`gbrain/*`、`productivity/*` 等）、加入 `computer-use` / `dogfood` / `yuanbao` trigger rows。
+  - `~/.hermes/skills/manifest.json` 已建立，skill conformance 通過。
+  - `resolver_health` 同 `skill_conformance` 已變成 ✅。
+  - 剩餘 warnings 全部屬可選項目，唔影響基本運作：
+    - `embeddings`：未建立 embedding，keyword-only mode 可用。
+    - `jsonb_integrity` / `pgvector`：PGLite 限制，正常。
+    - `retrieval_reflex_health`：retrieval-reflex policy skill 未裝，可選。
+    - `pack_upgrade_available`：有新 pack 可升級，可選。
+    - `takes_count`：takes.bootstrap_enabled=false，可選。
+    - `ze_embedding_health`：未設 `ZEROENTROPY_API_KEY`。
 
 ### 2.8 repomix
 
@@ -144,10 +152,11 @@ type: tracker
 |------|----------|------|------|
 | gbrain embedding key 未設定 | 低 | 可選 | keyword-only mode 可用，semantic search 需要 key |
 | gbrain retrieval-reflex 未 install | 低 | 可選 | 需要時再裝 |
-| gbrain pgvector warning | 低 | PGLite 正常 | PGLite 無獨立 pgvector 插件 |
-| gbrain resolver_health fail | 中 | 未修復 | 可建立 `skills/RESOLVER.md` 或為每個 SKILL.md 加 `triggers:` |
-| gbrain skill_conformance warning | 低 | 未修復 | manifest.json 未建立，可選 |
+| gbrain pgvector / jsonb integrity warning | 低 | PGLite 正常 | PGLite 無獨立 pgvector 插件 |
+| gbrain pack upgrade 可用 | 低 | 可選 | `gbrain-base-v2` 可升級 |
+| gbrain takes bootstrap | 低 | 可選 | `takes.bootstrap_enabled=false` |
 | Hermes update 可用 | 低 | 待低峰期處理 | `hermes update --check` 顯示落後 origin/main |
+| gbrain resolver_health / skill_conformance | ✅ 已修復 | 完成 | `gbrain check-resolvable` 0 errors 0 warnings |
 
 ---
 
@@ -155,7 +164,8 @@ type: tracker
 
 開工時：
 - [ ] Hermes WebUI health check 過到
-- [ ] gbrain doctor 無紅色 error
+- [ ] `gbrain doctor --json` status 為 `warnings` 或更好（resolver_health ✅）
+- [ ] `gbrain check-resolvable --json` 0 errors
 - [ ] repomix 版本正常
 - [ ] 必要時測試一張圖 vision_analyze
 
@@ -177,6 +187,7 @@ type: tracker
 | 2026-07-14 | 更新 tracker：gbrain 驗證需要載入 `.bun/bin` PATH，加入 gbrain PATH 未載入問題 | Hermes |
 | 2026-07-14 | 修復 gbrain PATH：喺 `~/.hermes/.env` 加入 `~/.bun/bin`；gbrain doctor 可直接執行 | Hermes |
 | 2026-07-14 | 加入自動 handover hook platform guard（只限 cli/telegram）同 unified secret 規則 | Hermes |
+| 2026-07-14 | 徹底修復 gbrain resolver：修正 `~/.hermes/skills/RESOLVER.md` 錯誤路徑、補齊 trigger rows、建立 `manifest.json`；`gbrain check-resolvable` 0 errors；health score 由 40 升至 65 | Hermes |
 
 ---
 

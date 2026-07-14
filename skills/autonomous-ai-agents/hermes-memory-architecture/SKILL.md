@@ -8,6 +8,17 @@ description: |
   context, reports, and decision logs across sessions.
 version: 1.0.0
 category: autonomous-ai-agents
+triggers:
+  - memory architecture
+  - obsidian memory
+  - 3-tier memory
+  - long-term memory
+  - hermes memory
+  - vault memory
+platforms: [linux, macos, windows]
+metadata:
+  hermes:
+    tags: [memory, obsidian, vault, architecture, long-term]
 ---
 
 # Hermes Memory Architecture
