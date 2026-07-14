@@ -38,13 +38,12 @@ Hermes Vault/
 ├── Daily/
 │   └── YYYY-MM-DD.md
 ├── System/
-│   ├── Assistant/
-│   │   ├── context.md
-│   │   ├── preferences.md
-│   │   ├── environment.md
-│   │   └── logs/
-│   │       └── issues-fixes-log.md
-│   └── ponytail.md
+│   └── Assistant/
+│       ├── context.md
+│       ├── preferences.md
+│       ├── environment.md
+│       └── logs/
+│           └── issues-fixes-log.md
 ├── Work/
 │   └── Projects/
 │       └── <Project Name>/
@@ -89,7 +88,7 @@ Hermes Vault/
 - Project scope and URLs
 - Architecture decisions
 - Final reports and analysis
-- Stable environment facts ("Hermes Vault is at /Users/chloe/Documents/Hermes Vault/")
+- Stable environment facts ("Hermes Vault is at ~/Documents/Hermes Vault/")
 - Skill/library references
 
 **Daily notes:**
@@ -104,7 +103,7 @@ For tasks that produce many screenshots, long DOM diffs, or HTML/PDF reports
 (e.g., site-clone validation), store the bulk under the project folder:
 
 ```
-Work/Projects/Site Clone Validation/
+Work/Projects/<Project Name>/
 ├── README.md
 └── assets/
     ├── old_site/
@@ -141,5 +140,3 @@ keep screenshot lists or full report text in Hermes hot memory.
 - `note-taking:obsidian` — reading, searching, and editing Obsidian vault notes.
 - `software-development:site-clone-validation` — an example of a project whose
   outputs should be stored in the vault.
-- `software-development:ponytail` — the lazy-senior approach applies here too:
-  do not build a complex sync system; use simple daily notes and project READMEs.

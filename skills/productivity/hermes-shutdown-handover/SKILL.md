@@ -32,9 +32,9 @@ Look at the current conversation context, memory, and recent tool calls to deter
 Run `git status` on the project repo(s). If there are uncommitted changes:
 - Summarize what they are
 - Ask the user if they want to commit them now, or if they should be left for later
-- If the user agrees, commit and push to the correct branch
+- If the user agrees, commit and push to the appropriate branch for that project
 
-For Hermes/Wild91 projects, the correct branch is `hermes/frontend-parity`, never `lite-tenant`.
+Do NOT hard-code branch names. Use the branch mentioned in the handover or the currently checked-out branch.
 
 ## 4. Update the handover file
 
