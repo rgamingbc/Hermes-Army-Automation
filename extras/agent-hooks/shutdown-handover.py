@@ -12,6 +12,7 @@ import os
 import re
 import subprocess
 import sys
+from datetime import datetime
 
 
 def _skip() -> None:
@@ -53,12 +54,19 @@ env["HERMES_STARTUP_HANDOVER"] = "skip"
 
 cmd = [os.path.expanduser("~/.local/bin/hermes"), "chat", "-q", prompt, "-Q", "--accept-hooks"]
 
+log_dir = os.path.join(home, "logs")
+os.makedirs(log_dir, exist_ok=True)
+log_path = os.path.join(log_dir, "shutdown-handover.log")
+with open(log_path, "a", encoding="utf-8") as log:
+    log.write(f"\n[{datetime.now().isoformat()}] spawning shutdown handover\n")
+
 # Run in background so the parent session teardown is not blocked.
+log_file = open(log_path, "a")
 process = subprocess.Popen(
     cmd,
     env=env,
-    stdout=subprocess.DEVNULL,
-    stderr=subprocess.DEVNULL,
+    stdout=log_file,
+    stderr=subprocess.STDOUT,
     start_new_session=True,
 )
 process.poll()

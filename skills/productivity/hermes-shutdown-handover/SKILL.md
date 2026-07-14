@@ -49,7 +49,10 @@ Do NOT hard-code branch names. Use the branch mentioned in the handover or the c
 Read the canonical tracker:
 - `~/Documents/Hermes Vault/Work/Projects/Hermes Agent Setup/Ecosystem Tools Tracker.md`
 
-If any tool status changed during this session (installed, upgraded, broken, or verified), update the tracker immediately. Then sync it to the `Hermes-Agent-Setup` repo if the repo is present locally.
+If any tool status changed during this session (installed, upgraded, broken, or verified), update the tracker immediately. Then sync the updated tracker to the `Hermes-Agent-Setup` repo at:
+- `~/Hermes-Agent-Setup/docs/Ecosystem-Tools-Tracker.md`
+
+Do NOT copy the project handover file into the repo; the handover stays in the Obsidian vault.
 
 Key verification commands:
 - Hermes WebUI: `curl -s http://127.0.0.1:8789/health`
