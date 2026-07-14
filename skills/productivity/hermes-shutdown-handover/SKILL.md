@@ -1,7 +1,11 @@
 ---
 name: hermes-shutdown-handover
-description: Global shutdown routine — update handover, archive completed items, and commit any pending work before ending a session.
+description: |-
+  Global shutdown routine — automatically run at the end of every working session.
+  Updates handover, archives completed items, updates ecosystem tools tracker, and
+  commits any pending work.
 triggers:
+  - session_end
   - shutdown
   - end session
   - goodbye
@@ -11,23 +15,24 @@ triggers:
   - 拜拜
   - 下次見
   - stop
+  - finish
 ---
 
 # Hermes Shutdown Handover
 
-This is a **global** skill. Every time Hermes is about to end a working session on a known project, run this routine. It ensures the next session can resume cleanly without relying on short-term memory.
+This is a **global** skill. **Run automatically at the end of every working session** whenever work is wrapping up. Do not wait for the user to say "收工" or "結束".
 
-## 1. Detect shutdown intent
+## When to run
 
-If the user says any of the following (or similar in Chinese), treat it as a shutdown:
-- "收工", "結束", "再見", "拜拜", "下次見", "stop", "done for now", "finish"
-- Or if a long-running task has just completed and the user says "好"
+- After a significant task or milestone is completed.
+- When the user says "好", "done", "finish", "收工", "結束", "再見", "拜拜", or similar.
+- Before any long pause or context window reset.
 
-## 2. Identify the active project
+## 1. Identify the active project
 
 Look at the current conversation context, memory, and recent tool calls to determine the active project. If uncertain, ask: "老公，我更新邊個 project 嘅 handover？"
 
-## 3. Check for uncommitted work
+## 2. Check for uncommitted work
 
 Run `git status` on the project repo(s). If there are uncommitted changes:
 - Summarize what they are
@@ -36,7 +41,21 @@ Run `git status` on the project repo(s). If there are uncommitted changes:
 
 Do NOT hard-code branch names. Use the branch mentioned in the handover or the currently checked-out branch.
 
-## 4. Update the handover file
+## 3. Update the Ecosystem Tools Tracker
+
+Read the canonical tracker:
+- `~/Documents/Hermes Vault/Work/Projects/Hermes Agent Setup/Ecosystem Tools Tracker.md`
+
+If any tool status changed during this session (installed, upgraded, broken, or verified), update the tracker immediately. Then sync it to the `Hermes-Agent-Setup` repo if the repo is present locally.
+
+Key verification commands:
+- Hermes WebUI: `curl -s http://127.0.0.1:8789/health`
+- agentic-stack: `python3 ~/.hermes/.agent/tools/show.py`
+- gbrain: `gbrain doctor --json`
+- repomix: `~/.hermes/bin/repomix --version`
+- Vision: `grep -n "auxiliary.vision" ~/.hermes/config.yaml`
+
+## 4. Update the project handover file
 
 Use the project handover file, typically:
 - `~/Documents/Hermes Vault/Work/Projects/<Project Name> Hermes Handover.md`
@@ -61,6 +80,7 @@ Tell the user:
 - What was completed in this session
 - What is now pending
 - Where the handover is updated
+- Any ecosystem tool status changes
 - Any blockers for next time
 
 Use the user's preferred language (Cantonese for this user). Keep it under 5 short sentences.
@@ -90,7 +110,9 @@ status: active
 
 ## Pitfalls
 
+- Do NOT wait for the user to trigger this skill explicitly.
 - Do NOT forget to update the handover even if the user just said "好".
 - Do NOT leave uncommitted repo changes without asking the user.
 - Do NOT let the main handover exceed ~5,000 chars; archive old items.
 - Do NOT delete the user's handover rules or iron-clad constraints.
+- Do NOT forget to update the Ecosystem Tools Tracker after any tool changes.
