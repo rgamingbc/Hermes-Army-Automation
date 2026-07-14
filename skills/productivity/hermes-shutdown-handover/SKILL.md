@@ -30,14 +30,17 @@ This is a **global** skill. **Run automatically at the end of every working sess
 
 ## 1. Identify the active project
 
-Look at the current conversation context, memory, and recent tool calls to determine the active project. If uncertain, ask: "老公，我更新邊個 project 嘅 handover？"
+Look at the current conversation context, memory, and recent tool calls to determine the active project.
+
+- **Interactive:** If uncertain, ask: "老公，我更新邊個 project 嘅 handover？"
+- **Automatic / hook mode:** If this session was spawned by the `on_session_end` shell hook, do not ask. Default to the most recently mentioned project, or fall back to `Hermes Agent Setup` and update its handover and Ecosystem Tools Tracker.
 
 ## 2. Check for uncommitted work
 
-Run `git status` on the project repo(s). If there are uncommitted changes:
-- Summarize what they are
-- Ask the user if they want to commit them now, or if they should be left for later
-- If the user agrees, commit and push to the appropriate branch for that project
+Run `git status` on the project repo(s).
+
+- **Interactive:** Summarize uncommitted changes, ask the user if they want to commit now, and commit/push only if they agree.
+- **Automatic / hook mode:** Do not ask the user. Summarize the changes in the handover, then commit and push only if the user has previously given blanket approval for automatic commits. Otherwise leave the changes staged or untouched and note them in the handover.
 
 Do NOT hard-code branch names. Use the branch mentioned in the handover or the currently checked-out branch.
 
