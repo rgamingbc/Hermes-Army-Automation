@@ -121,6 +121,17 @@ hermes --profile my-team-member kanban show
 hermes -s hermes-startup-handover
 ```
 
+## 自動開工／收工（可選）
+
+想 Hermes 喺每個 session 開始／結束時自動執行 startup / shutdown handover，
+請參考 [`extras/agent-hooks/README.md`](extras/agent-hooks/README.md) 安裝兩個 shell hook。
+
+重點：
+
+1. 複製 `extras/agent-hooks/*.py` 到 `~/.hermes/agent-hooks/`。
+2. 喺 `~/.hermes/config.yaml` 加入 `hooks:` 區塊，指向絕對路徑。
+3. 設定 `hooks_auto_accept: true`（非 TTY 環境必需）。
+
 ## 客製化
 
 - 修改 `skills/` 入面嘅 SKILL.md 後，重新執行 `./install-skills.sh` 即可同步到 `~/.hermes/skills/`。
