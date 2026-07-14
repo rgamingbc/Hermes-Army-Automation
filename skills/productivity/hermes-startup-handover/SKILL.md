@@ -19,15 +19,19 @@ triggers:
 
 # Hermes Startup Handover
 
-This is a **global** skill. **Run automatically at the start of every working session** before doing anything else. Do not wait for the user to say "start", "開工", or "繼續".
+This is a **global** skill. **Run automatically at the start of every working session** before doing anything else. Do not wait for the user to say "start", "開工", or "繼續". The user expects this to happen proactively after an overnight session reset.
 
 ## When to run
 
 - Every new conversation/session that is not explicitly a fresh start.
-- If the user says "start", "continue", "開工", "繼續", or similar.
 - At the start of the day if the previous session has been cleared.
+- If the user says "start", "continue", "開工", "繼續", or similar.
 
 If the user explicitly says "start fresh", "new project", or "ignore previous work", skip this skill.
+
+## User expectation (learned from correction)
+
+The user expects Hermes to resume context automatically after the session resets. They should not have to ask for the handover; it is the first thing Hermes does. When the user says something like "比多次皇冠 ACC PW 我" after a reset, it means a required secret was not durably preserved. The startup routine must surface the credential gap immediately so the user can re-supply it before any work is wasted.
 
 ## 1. Identify the active project
 

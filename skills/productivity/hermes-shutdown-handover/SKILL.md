@@ -20,13 +20,17 @@ triggers:
 
 # Hermes Shutdown Handover
 
-This is a **global** skill. **Run automatically at the end of every working session** whenever work is wrapping up. Do not wait for the user to say "收工" or "結束".
+This is a **global** skill. **Run automatically at the end of every working session** whenever work is wrapping up. Do not wait for the user to say "收工" or "結束". The user expects handover updates to happen automatically, not only when explicitly triggered.
 
 ## When to run
 
 - After a significant task or milestone is completed.
 - When the user says "好", "done", "finish", "收工", "結束", "再見", "拜拜", or similar.
 - Before any long pause or context window reset.
+
+## User expectation (learned from correction)
+
+The user expects shutdown to be automatic and comprehensive. If a secret (e.g., site credentials) was used during the session, the shutdown routine must ensure it is stored in the agreed durable location and reflected in the handover. If the user later says the credential was lost, it means the previous shutdown failed to record it. Treat secrets used during the session as mandatory handover items, not optional memory. When the user says credentials are to be "記住" / saved, persist them in the agreed secure store (e.g., macOS Keychain, `.hermes/.env`, or a vault file if the user explicitly allows) and record the storage location in the handover. "不寫入檔案" only applies when the user has explicitly forbidden it.
 
 ## 1. Identify the active project
 
