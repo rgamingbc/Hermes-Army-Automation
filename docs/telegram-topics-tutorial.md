@@ -140,9 +140,4 @@ Hermes (in #ceo-delegation):
 
 ## Next step
 
-After Telegram is ready, wire up the Notion polling trigger:
-
-- [`scripts/notion_poll.py`](../scripts/notion_poll.py)
-- [`docs/notion-trigger-setup.md`](notion-trigger-setup.md) (if available)
-
-Or type `/army-ceo-delegate` in `#ceo-delegation` to start delegating.
+Type `/army-ceo-delegate` in `#ceo-delegation` to start delegating.

@@ -3,7 +3,7 @@
 呢個 repo 包含兩部分：
 
 1. **通用 Hermes Agent 設定** — 適用於任何新 Hermes agent / 團隊成員。
-2. **Army Team 專用自動化** — `army-hq`、`army-marketing-head`、`army-dev-head`、`army-research-head` 嘅協作設定：Kanban、CEO delegation skill、Telegram Topics 教學、Notion 輪詢觸發器。
+2. **Army Team 專用自動化** — `army-hq`、`army-marketing-head`、`army-dev-head`、`army-research-head` 嘅協作設定：Kanban、CEO delegation skill、Telegram Topics 教學。
 
 目標：之後開新 Team Bot 可以直接 fork / clone 呢個 repo，改幾個 placeholder 就開工。
 
@@ -25,8 +25,6 @@
 - `skills/custom/army-ceo-delegate/SKILL.md` — CEO 委派 protocol
 - `templates/army-profiles/<profile>/{config.yaml,.env}` — 四個 army profile 模板
 - `docs/telegram-topics-tutorial.md` — Telegram Topics 群組教學
-- `docs/notion-trigger-setup.md` — Notion integration + 輪詢觸發器
-- `scripts/notion_poll.py` — Notion database 輪詢腳本
 
 ## 快速開始（通用）
 
@@ -61,7 +59,6 @@ cp templates/army-profiles/army-hq/.env       ~/.hermes/profiles/army-hq/.env
 
 - `config.yaml` 入面 `auxiliary.vision.api_key` → 換成實際 Kimi key。
 - `.env` 入面 `KIMI_API_KEY`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_ALLOWED_USERS`。
-- `army-hq/.env` 再填 `NOTION_API_KEY`、`NOTION_DATABASE_ID`。
 
 ### 4. 建立共用 kanban board
 
@@ -95,18 +92,6 @@ done
 跟住 [`docs/telegram-topics-tutorial.md`](docs/telegram-topics-tutorial.md) 開 `Army HQ` group，啟用 Topics，關閉 bot Group Privacy，再開 `#general`、`#marketing`、`#dev`、`#research`、`#ceo-delegation`。
 
 記住：**一個 Telegram bot token 只可以有一個 live consumer**，每個 profile 要用自己嘅 bot。
-
-## Notion → Hermes 觸發器
-
-跟住 [`docs/notion-trigger-setup.md`](docs/notion-trigger-setup.md) 建立 integration、連 database、填 `.env`、測試腳本，再註冊 cron：
-
-```bash
-~/.local/bin/hermes --profile army-hq cron create \
-  --name notion-to-hermes \
-  --schedule "*/10 * * * *" \
-  --command "python3 /Users/chloe/.hermes/scripts/notion_poll.py" \
-  --deliver telegram
-```
 
 ## Secret 管理
 
