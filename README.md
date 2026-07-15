@@ -1,84 +1,59 @@
 # Hermes Army Automation
 
-呢個 repo 包含兩部分：
+Army Team 專用 Hermes 自動化設定。通用 Hermes 設定透過 `git subtree` 引入，唔會同 Army 專用檔案混埋，亦唔會 divergence。
 
-1. **通用 Hermes Agent 設定** — 適用於任何新 Hermes agent / 團隊成員。
-2. **Army Team 專用自動化** — `army-hq`、`army-marketing-head`、`army-dev-head`、`army-research-head` 嘅協作設定：Kanban、CEO delegation skill、Telegram Topics 教學。
+## 結構
 
-目標：之後開新 Team Bot 可以直接 fork / clone 呢個 repo，改幾個 placeholder 就開工。
+```
+Hermes-Army-Automation/
+├── README.md                         # 呢份文件
+├── scripts/
+│   ├── setup-army-team.sh            # 一鍵開箱腳本
+│   └── check_generic_updates.py      # 檢查通用 repo 更新
+├── skills/
+│   └── custom/
+│       └── army-ceo-delegate/        # Army CEO 委派 skill
+├── templates/
+│   └── army-profiles/                # army-hq / marketing / dev / research 模板
+├── docs/
+│   └── telegram-topics-tutorial.md   # Telegram Topics 教學
+└── vendor/
+    └── hermes-agent-setup/           # git subtree 引入嘅通用設定
+```
 
-## 內容
-
-### 通用 skills
-
-- `skills/autonomous-ai-agents/hermes-memory-architecture` — 3-tier 記憶架構
-- `skills/autonomous-ai-agents/hermes-setup-checklist` — 新 profile / team 開箱檢查清單
-- `skills/note-taking/obsidian` — Obsidian vault 讀寫指引
-- `skills/productivity/hermes-startup-handover` — 每次開工先讀 handover
-- `skills/productivity/hermes-shutdown-handover` — 每次收工更新 handover
-- `skills/software-development/site-clone-css-validation` — 新舊網站 CSS/DOM 比較 workflow
-- `skills/RESOLVER.md` + `skills/manifest.json` — gbrain 解析用
-- `templates/RESOLVER-full.md` + `templates/manifest-full.json` — 完整 routing template
-
-### Army 專用
-
-- `skills/custom/army-ceo-delegate/SKILL.md` — CEO 委派 protocol
-- `templates/army-profiles/<profile>/{config.yaml,.env}` — 四個 army profile 模板
-- `docs/telegram-topics-tutorial.md` — Telegram Topics 群組教學
-
-## 快速開始（通用）
+## 開箱（一次性）
 
 ```bash
 cd ~
 gh repo clone rgamingbc/Hermes-Army-Automation
 cd Hermes-Army-Automation
-./install-skills.sh
+./scripts/setup-army-team.sh
 ```
 
-`install-skills.sh` 會備份舊嘅 `~/.hermes/skills/RESOLVER.md`，再同步 repo 嘅 skills。
+`setup-army-team.sh` 會做：
+1. 用 `vendor/hermes-agent-setup/install-skills.sh` 安裝通用 skills。
+2. 將 `army-ceo-delegate` skill 複製到 `~/.hermes/skills/custom/`。
+3. 建立 `army-hq`、`army-marketing-head`、`army-dev-head`、`army-research-head` 四個 profile。
+4. 複製 profile 模板，並將 `/Users/chloe` 路徑換成你嘅 `$HOME`。
+5. 建立 `army` kanban board。
+6. 如果有 `KIMI_API_KEY`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_ALLOWED_USERS` 環境變數，會自動替換 placeholder。
 
-## Army Team 開箱
+### 手動填入 secret
 
-### 1. 建立 profiles
+執行完腳本後，檢查以下檔案：
 
 ```bash
-for p in army-hq army-marketing-head army-dev-head army-research-head; do
-  hermes profile create "$p"
-done
+~/.hermes/profiles/{army-hq,army-marketing-head,army-dev-head,army-research-head}/.env
+~/.hermes/profiles/{army-hq,army-marketing-head,army-dev-head,army-research-head}/config.yaml
 ```
 
-### 2. 複製模板
+重點填：
+- `.env`：`KIMI_API_KEY`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_ALLOWED_USERS`
+- `config.yaml`：`auxiliary.vision.api_key`
 
-```bash
-cp templates/army-profiles/army-hq/config.yaml ~/.hermes/profiles/army-hq/config.yaml
-cp templates/army-profiles/army-hq/.env       ~/.hermes/profiles/army-hq/.env
-# 對其餘三個 profile 做同樣動作
-```
+記住：**一個 Telegram bot token 只可以有一個 live consumer**，每個 profile 要用自己嘅 bot。
 
-### 3. 填 placeholder
-
-- `config.yaml` 入面 `auxiliary.vision.api_key` → 換成實際 Kimi key。
-- `.env` 入面 `KIMI_API_KEY`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_ALLOWED_USERS`。
-
-### 4. 建立共用 kanban board
-
-```bash
-~/.local/bin/hermes kanban boards create army \
-  --name "Army Team" \
-  --description "Cross-department army team board" \
-  --icon 🎖️ \
-  --switch \
-  --default-workdir /Users/chloe/hermes-army/launch-2026
-```
-
-### 5. 安裝 CEO delegation skill
-
-```bash
-mkdir -p ~/.hermes/skills/custom
-cp -r skills/custom/army-ceo-delegate ~/.hermes/skills/custom/
-```
-
-### 6. 驗證
+### 驗證
 
 ```bash
 for p in army-hq army-marketing-head army-dev-head army-research-head; do
@@ -91,19 +66,15 @@ done
 
 跟住 [`docs/telegram-topics-tutorial.md`](docs/telegram-topics-tutorial.md) 開 `Army HQ` group，啟用 Topics，關閉 bot Group Privacy，再開 `#general`、`#marketing`、`#dev`、`#research`、`#ceo-delegation`。
 
-記住：**一個 Telegram bot token 只可以有一個 live consumer**，每個 profile 要用自己嘅 bot。
+## 更新通用設定
 
-## 定期檢查通用設定更新
+通用 repo 有新內容時，`check_generic_updates.py` 會提醒你。
 
-Army repo 係 `Hermes-Agent-Setup` 嘅 fork。通用 repo 更新後，要定期 merge 返嚟，否則兩邊會 diverge。
-
-Repo 已提供 `scripts/check_generic_updates.py`：
+手動檢查：
 
 ```bash
-python3 /Users/chloe/Hermes-Army-Automation/scripts/check_generic_updates.py
+python3 scripts/check_generic_updates.py
 ```
-
-輸出會顯示未 merge 嘅 commit 數量、簡短 log 同一條對比連結，方便你一眼睇完有咩更新。
 
 建議每星期用 Hermes cron 檢查一次：
 
@@ -111,44 +82,28 @@ python3 /Users/chloe/Hermes-Army-Automation/scripts/check_generic_updates.py
 ~/.local/bin/hermes --profile army-hq cron create \
   --name check-generic-updates \
   --schedule "0 9 * * 1" \
-  --command "python3 /Users/chloe/Hermes-Army-Automation/scripts/check_generic_updates.py" \
+  --command "python3 /Users/$USER/Hermes-Army-Automation/scripts/check_generic_updates.py" \
   --deliver telegram
 ```
 
-收到提醒後，手動 merge：
+見到提醒後，喺 Army repo root 執行：
 
 ```bash
-cd ~/Hermes-Army-Automation
-git fetch upstream
-git merge upstream/main
-# 解決衝突後 push
+git subtree pull --prefix=vendor/hermes-agent-setup \
+  https://github.com/rgamingbc/Hermes-Agent-Setup.git main --squash
 ```
-
-> 如果你唔想 fork 通用內容，也可以只保留 Army 專用檔案，然後參考通用 repo 嘅文件手動套用更新。呢個 repo 入面嘅 `scripts/check_generic_updates.py` 同樣可以提醒你幾時有更新。
 
 ## Secret 管理
 
 - 所有 secret 值統一擺喺 `~/.hermes/.env` 或 profile `.env`。
 - Obsidian vault 只記索引，唔記值。
-- 詳情見 [`LOCAL-SECRETS.md`](LOCAL-SECRETS.md)。
-
-## gbrain resolver / manifest
-
-Repo 自帶 `skills/RESOLVER.md` 同 `skills/manifest.json`。如果你有大量 gbrain routing，參考 `templates/RESOLVER-full.md` 合併而唔係覆蓋。
-
-安裝後驗證：
-
-```bash
-cd ~
-gbrain check-resolvable --json
-gbrain doctor --json
-```
+- 詳情見 `vendor/hermes-agent-setup/LOCAL-SECRETS.md`。
 
 ## 客製化
 
-- 通用 skill 改 `skills/`，再跑 `./install-skills.sh`。
-- Army 專用 skill 改 `skills/custom/`。
-- 開新 team 時 fork 呢個 repo，改 `templates/army-profiles/` 入面嘅名同 placeholder。
+- Army 專用 skill：改 `skills/custom/`，再跑一次 `setup-army-team.sh` 或手動複製。
+- Profile 模板：改 `templates/army-profiles/`。
+- 開新 team：fork 呢個 repo，改 `templates/army-profiles/` 入面嘅名同 placeholder。
 
 ## License
 

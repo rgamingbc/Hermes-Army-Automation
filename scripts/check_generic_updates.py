@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """
-Check whether the generic Hermes-Agent-Setup repo has new commits that the
-Army repo has not merged yet.
+Check whether the vendored Hermes-Agent-Setup (under vendor/hermes-agent-setup)
+is behind the upstream generic repo.
 
-Prints a concise reminder with:
+Prints a reminder with:
 - number of new commits
 - a short commit log
-- a compare link to review the changes
-
-Designed to be run from a cron job or manually.
+- the exact git subtree pull command to update
 """
 
 import subprocess
@@ -16,14 +14,13 @@ import sys
 from pathlib import Path
 
 ARMY_DIR = Path(__file__).resolve().parent.parent
+VENDOR_DIR = ARMY_DIR / "vendor" / "hermes-agent-setup"
 UPSTREAM_URL = "https://github.com/rgamingbc/Hermes-Agent-Setup.git"
 COMPARE_URL = "https://github.com/rgamingbc/Hermes-Agent-Setup/compare/{}...{}"
 
 
-def run(cmd, cwd=ARMY_DIR, check=True):
-    result = subprocess.run(
-        cmd, cwd=cwd, text=True, capture_output=True, check=False
-    )
+def run(cmd, cwd=VENDOR_DIR, check=True):
+    result = subprocess.run(cmd, cwd=cwd, text=True, capture_output=True, check=False)
     if check and result.returncode != 0:
         raise RuntimeError(
             f"Command failed: {' '.join(cmd)}\n{result.stderr.strip()}"
@@ -31,49 +28,54 @@ def run(cmd, cwd=ARMY_DIR, check=True):
     return result
 
 
-def ensure_upstream():
-    result = run(["git", "remote", "get-url", "upstream"], check=False)
-    if result.returncode != 0:
-        print("Adding upstream remote for Hermes-Agent-Setup...")
-        run(["git", "remote", "add", "upstream", UPSTREAM_URL])
+def is_ancestor(ancestor, descendant):
+    result = run(
+        ["git", "merge-base", "--is-ancestor", ancestor, descendant], check=False
+    )
+    return result.returncode == 0
 
 
 def main() -> int:
-    if not (ARMY_DIR / ".git").exists():
-        print(f"Error: {ARMY_DIR} does not look like a git repository.", file=sys.stderr)
+    if not VENDOR_DIR.exists():
+        print(f"Error: {VENDOR_DIR} not found.", file=sys.stderr)
+        print("This script expects the generic repo to be imported via git subtree:")
+        print(
+            "  git subtree add --prefix=vendor/hermes-agent-setup "
+            f"{UPSTREAM_URL} main --squash"
+        )
         return 1
 
-    ensure_upstream()
-    run(["git", "fetch", "upstream", "main"])
+    remotes = run(["git", "remote"]).stdout.strip().splitlines()
+    if "origin" not in remotes:
+        run(["git", "remote", "add", "origin", UPSTREAM_URL])
+
+    run(["git", "fetch", "origin", "main"])
 
     local = run(["git", "rev-parse", "HEAD"]).stdout.strip()
-    upstream = run(["git", "rev-parse", "upstream/main"]).stdout.strip()
+    upstream = run(["git", "rev-parse", "origin/main"]).stdout.strip()
 
-    if local == upstream:
-        print("✅ 通用設定 Hermes-Agent-Setup 已經係最新，無需更新。")
+    if local == upstream or is_ancestor(upstream, local):
+        print("✅ vendor/hermes-agent-setup 已經係最新，無需更新。")
         return 0
 
-    base = run(["git", "merge-base", "HEAD", "upstream/main"]).stdout.strip()
+    base = run(["git", "merge-base", "HEAD", "origin/main"]).stdout.strip()
     count = run(
-        ["git", "rev-list", "--count", f"{base}..upstream/main"]
+        ["git", "rev-list", "--count", f"{base}..origin/main"]
     ).stdout.strip()
     log = run(
-        ["git", "log", "--oneline", "-10", f"{base}..upstream/main"]
+        ["git", "log", "--oneline", "-10", f"{base}..origin/main"]
     ).stdout.strip()
     compare = COMPARE_URL.format(base[:12], upstream[:12])
 
-    print(f"⚠️ 通用設定 Hermes-Agent-Setup 有 {count} 個新 commit 未 merge 到 Army repo：")
+    print(f"⚠️ 通用設定 Hermes-Agent-Setup 有 {count} 個新 commit 未更新到 Army repo：")
     print()
     print(log)
     print()
     print(f"對比連結：{compare}")
     print()
-    print("建議做法：")
-    print(f"  cd {ARMY_DIR}")
-    print("  git checkout main")
-    print("  git pull origin main")
-    print("  git merge upstream/main")
-    print("  # 解決衝突後 push")
+    print("更新做法（喺 Army repo root 執行）：")
+    print("  git subtree pull --prefix=vendor/hermes-agent-setup ")
+    print(f"    {UPSTREAM_URL} main --squash")
     return 0
 
 
