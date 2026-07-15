@@ -38,20 +38,31 @@ cd Hermes-Army-Automation
 5. 建立 `army` kanban board。
 6. 如果有 `KIMI_API_KEY`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_ALLOWED_USERS` 環境變數，會自動替換 placeholder。
 
-### 手動填入 secret
+### 手動填入 API keys / tokens
 
-執行完腳本後，檢查以下檔案：
+執行完腳本後，**一定要**檢查以下檔案：
 
 ```bash
 ~/.hermes/profiles/{army-hq,army-marketing-head,army-dev-head,army-research-head}/.env
 ~/.hermes/profiles/{army-hq,army-marketing-head,army-dev-head,army-research-head}/config.yaml
 ```
 
-重點填：
+最少要填：
 - `.env`：`KIMI_API_KEY`、`TELEGRAM_BOT_TOKEN`、`TELEGRAM_ALLOWED_USERS`
-- `config.yaml`：`auxiliary.vision.api_key`
+- `config.yaml`：`auxiliary.vision.api_key`（如果你用 Kimi，通常同 `KIMI_API_KEY` 一樣）
 
-記住：**一個 Telegram bot token 只可以有一個 live consumer**，每個 profile 要用自己嘅 bot。
+如果你用緊唔同嘅 model provider（例如 OpenRouter、Gemini），請將 `config.yaml` 嘅 `model` 區塊同 `auxiliary.vision` 改成對應設定。
+
+每個 profile 應該有自己獨立嘅 Telegram bot token。setup script 支援 per-profile env var：
+
+```bash
+ARMY_HQ_TELEGRAM_BOT_TOKEN=...
+ARMY_MARKETING_HEAD_TELEGRAM_BOT_TOKEN=...
+ARMY_DEV_HEAD_TELEGRAM_BOT_TOKEN=...
+ARMY_RESEARCH_HEAD_TELEGRAM_BOT_TOKEN=...
+```
+
+如果冇設 per-profile，會 fallback 用通用 `TELEGRAM_BOT_TOKEN`。
 
 ### 驗證
 
@@ -61,6 +72,27 @@ for p in army-hq army-marketing-head army-dev-head army-research-head; do
   ~/.local/bin/hermes --profile "$p" kanban show
 done
 ```
+
+## 可選：啟用 YOLO mode / EXEC_ASK（高風險！）
+
+預設 `.env` template **唔會**開啟呢兩個選項。如果你需要非互動 automation（例如 cron job 唔想每次被問），可以手動加入，但**必須清楚風險**。
+
+### HERMES_YOLO_MODE=1
+
+ Hermes 遇到 `rm`、覆蓋檔案、改系統設定等危險指令時，會**直接執行，唔再問**。適合全自動環境，但極高危，尤其 Telegram bot 對外開放時。
+
+### HERMES_EXEC_ASK=false
+
+喺 Telegram / Discord 等 messaging gateway 中，Hermes 執行工具前通常會問「確定？」。設 `false` 後會**直接執行**。同樣只適合受控自動化環境。
+
+啟用方法：喺每個 profile 嘅 `.env` 加入：
+
+```bash
+HERMES_YOLO_MODE=1
+HERMES_EXEC_ASK=false
+```
+
+> ⚠️ 只喺你 100% 信任所有可觸發 bot 嘅人同流程時先好開。
 
 ## Telegram Topics 工作空間
 
