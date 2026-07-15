@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "name": "software-development/site-clone-css-validation",
+      "path": "software-development/site-clone-css-validation/SKILL.md",
+      "triggers": [
+        "site clone validation",
+        "CSS comparison",
+        "frontend comparison",
+        "DOM comparison",
+        "old site vs new site"
+      ]
+    },
+    {
+      "name": "note-taking/obsidian",
+      "path": "note-taking/obsidian/SKILL.md",
+      "triggers": [
+        "obsidian",
+        "vault note",
+        "read note",
+        "edit note",
+        "create note"
+      ]
+    },
+    {
+      "name": "autonomous-ai-agents/hermes-memory-architecture",
+      "path": "autonomous-ai-agents/hermes-memory-architecture/SKILL.md",
+      "triggers": [
+        "memory architecture",
+        "obsidian memory",
+        "3-tier memory",
+        "long-term memory",
+        "hermes memory",
+        "vault memory"
+      ]
+    },
+    {
+      "name": "autonomous-ai-agents/hermes-setup-checklist",
+      "path": "autonomous-ai-agents/hermes-setup-checklist/SKILL.md",
+      "triggers": [
+        "setup checklist",
+        "hermes setup",
+        "onboard profile",
+        "new profile",
+        "team setup"
+      ]
+    },
+    {
+      "name": "productivity/hermes-shutdown-handover",
+      "path": "productivity/hermes-shutdown-handover/SKILL.md",
+      "triggers": [
+        "session_end",
+        "shutdown",
+        "end session",
+        "goodbye",
+        "\u6536\u5de5",
+        "\u7d50\u675f",
+        "\u518d\u898b",
+        "\u62dc\u62dc",
+        "\u4e0b\u6b21\u898b",
+        "stop"
+      ]
+    },
+    {
+      "name": "productivity/hermes-startup-handover",
+      "path": "productivity/hermes-startup-handover/SKILL.md",
+      "triggers": [
+        "session_start",
+        "startup",
+        "handover",
+        "daily standup",
+        "resume project",
+        "continue work",
+        "morning",
+        "\u958b\u59cb",
+        "\u958b\u5de5"
+      ]
+    }
+  ]
+}
