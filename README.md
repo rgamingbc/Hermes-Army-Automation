@@ -93,6 +93,39 @@ done
 
 記住：**一個 Telegram bot token 只可以有一個 live consumer**，每個 profile 要用自己嘅 bot。
 
+## 定期檢查通用設定更新
+
+Army repo 係 `Hermes-Agent-Setup` 嘅 fork。通用 repo 更新後，要定期 merge 返嚟，否則兩邊會 diverge。
+
+Repo 已提供 `scripts/check_generic_updates.py`：
+
+```bash
+python3 /Users/chloe/Hermes-Army-Automation/scripts/check_generic_updates.py
+```
+
+輸出會顯示未 merge 嘅 commit 數量、簡短 log 同一條對比連結，方便你一眼睇完有咩更新。
+
+建議每星期用 Hermes cron 檢查一次：
+
+```bash
+~/.local/bin/hermes --profile army-hq cron create \
+  --name check-generic-updates \
+  --schedule "0 9 * * 1" \
+  --command "python3 /Users/chloe/Hermes-Army-Automation/scripts/check_generic_updates.py" \
+  --deliver telegram
+```
+
+收到提醒後，手動 merge：
+
+```bash
+cd ~/Hermes-Army-Automation
+git fetch upstream
+git merge upstream/main
+# 解決衝突後 push
+```
+
+> 如果你唔想 fork 通用內容，也可以只保留 Army 專用檔案，然後參考通用 repo 嘅文件手動套用更新。呢個 repo 入面嘅 `scripts/check_generic_updates.py` 同樣可以提醒你幾時有更新。
+
 ## Secret 管理
 
 - 所有 secret 值統一擺喺 `~/.hermes/.env` 或 profile `.env`。
