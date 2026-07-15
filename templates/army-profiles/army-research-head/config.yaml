@@ -1,0 +1,41 @@
+model:
+  default: kimi-k2.7-code
+  provider: kimi-coding
+  base_url: https://api.kimi.com/coding/v1
+  supports_vision: true
+
+toolsets:
+  - kanban
+
+approvals:
+  destructive_slash_confirm: false
+  command: auto
+  write: auto
+
+terminal:
+  backend: local
+  cwd: .
+  timeout: 180
+  lifetime_seconds: 300
+
+skills:
+  external_dirs:
+    - /Users/chloe/.hermes/skills/custom
+
+delegation:
+  max_concurrent_children: 4
+  max_spawn_depth: 2
+  orchestrator_enabled: true
+  max_iterations: 30
+
+agent:
+  max_turns: 40
+  reasoning_effort: medium
+
+auxiliary:
+  vision:
+    provider: custom
+    base_url: https://api.kimi.com/coding/v1
+    model: kimi-k2.7-code
+    timeout: 120
+    api_key: __KIMI_API_KEY__
