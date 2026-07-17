@@ -30,6 +30,8 @@ cd Hermes-Army-Automation
 ./scripts/setup-army-team.sh
 ```
 
+> ⚠️ **Hermes 版本要求**：我哋實測過，舊版 Hermes（v0.18.2 早期 commit）喺啟動 Telegram gateway 時會卡住喺 `Connecting to Telegram`。如果遇到呢個問題，請先跑 `~/.local/bin/hermes update`，然後再啟動 gateway。
+
 `setup-army-team.sh` 會做：
 1. 用 `vendor/hermes-agent-setup/install-skills.sh` 安裝通用 skills。
 2. 將 `army-ceo-delegate` skill 複製到 `~/.hermes/skills/custom/`。
@@ -52,6 +54,16 @@ cd Hermes-Army-Automation
 - `config.yaml`：`auxiliary.vision.api_key`（如果你用 Kimi，通常同 `KIMI_API_KEY` 一樣）
 
 如果你用緊唔同嘅 model provider（例如 OpenRouter、Gemini），請將 `config.yaml` 嘅 `model` 區塊同 `auxiliary.vision` 改成對應設定。
+
+### Telegram fallback IPs
+
+Profile `config.yaml` 已經 hard-code 咗 Telegram fallback IPs，並且 `.env` 入面有：
+
+```bash
+HERMES_TELEGRAM_DISABLE_FALLBACK_IPS=1
+```
+
+呢個係為咗避免 Hermes 喺啟動時用 DNS-over-HTTPS 發現 fallback IP，喺某啟網絡會 hang 住。一般情況下唔使改。
 
 每個 profile 應該有自己獨立嘅 Telegram bot token。setup script 支援 per-profile env var：
 
@@ -97,6 +109,31 @@ HERMES_EXEC_ASK=false
 ## Telegram Topics 工作空間
 
 跟住 [`docs/telegram-topics-tutorial.md`](docs/telegram-topics-tutorial.md) 開 `Army HQ` group，啟用 Topics，關閉 bot Group Privacy，再開 `#general`、`#marketing`、`#dev`、`#research`、`#ceo-delegation`。
+
+### Memory vs Topics 隔離
+
+Hermes 有兩層記憶：
+
+| 層次 | 儲存 | 共享範圍 | 用途 |
+|---|---|---|---|
+| **User profile memory** (`USER.md`) | `~/.hermes/profiles/<profile>/memories/` | 跨 chat、跨 topic | 個人偏好、背景（例如你養咩寵物） |
+| **Session transcript** | SQLite `~/.hermes/profiles/<profile>/state.db` | 只限同一 topic | 呢次對話嘅具體內容（例如會議代號 Alpha-7） |
+
+實測結果：
+
+- `#test-isolation` 講「會議代號 Alpha-7」，切去 `#general` 問同一問題，SBB 答唔出 ✅
+- 個人資訊如「我養緊 TestCat」會寫入 user profile，所以 `#general` 都記得 ✅（呢個係預期行為）
+
+即係話 **Telegram Topics 本身已經做到 session 隔離**，但用戶個人記憶本來就應該跨 topic 共享。
+
+### 長期項目知識放邊？
+
+- **User memory**（`USER.md`）：個人偏好、簡短背景
+- **MEMORY.md**：環境、慣例、項目指標
+- **Obsidian vault**（`$OBSIDIAN_VAULT_PATH`）：詳細文件、會議記錄、決策、規格 —— 透過 file tools / `obsidian` skill 讀寫
+- **Kanban board**（`HERMES_KANBAN_BOARD=army`）：任務追蹤
+
+建議：**Obsidian vault + filesystem 為主，Hermes memory 為輔**。
 
 ## 更新通用設定
 

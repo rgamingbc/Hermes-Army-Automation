@@ -127,7 +127,32 @@ Hermes (in #ceo-delegation):
 
 ---
 
-## Step 6 — Troubleshooting
+## Step 6 — Verify topic isolation
+
+Hermes uses **two separate memory layers**:
+
+| Layer | Scope | Example |
+|---|---|---|
+| **User profile memory** (`USER.md`) | Cross-chat, cross-topic | Your name, preferences, "I have a cat named TestCat" |
+| **Session transcript** | Per topic | "Meeting codename Alpha-7" discussed only in `#test-isolation` |
+
+To verify that **session context is isolated per topic**, test with *session-only* information:
+
+1. In `#test-isolation`, send:
+   > 今次會議代號係 Alpha-7，記住佢。
+2. In `#general`, send:
+   > 今次會議代號係咩？
+
+Expected result:
+
+- `#test-isolation` remembers `Alpha-7`.
+- `#general` does **not** know the codename — it only sees its own thread.
+
+If you test with personal facts like "I have a cat named TestCat", Hermes may still answer in `#general` because that fact is stored in your user profile memory. That is intentional.
+
+---
+
+## Step 7 — Troubleshooting
 
 | Symptom | Cause | Fix |
 |---|---|---|
@@ -135,6 +160,7 @@ Hermes (in #ceo-delegation):
 | No Topics toggle in group info | Group is not a supergroup | Recreate the group, then enable Topics |
 | Replies land in `#general` instead of the source topic | `message_thread_id` missing | Make sure the bot is added as a member of the topic and Group Privacy is OFF |
 | Two profiles fight over the same bot token | Token shared | Create one bot per profile via @BotFather |
+| Gateway stuck at "Connecting to Telegram" | DNS-over-HTTPS fallback discovery hangs | The profile config already hard-codes fallback IPs; make sure `HERMES_TELEGRAM_DISABLE_FALLBACK_IPS=1` is set in `.env` |
 
 ---
 

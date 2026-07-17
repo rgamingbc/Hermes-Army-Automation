@@ -4,6 +4,30 @@ model:
   base_url: https://api.kimi.com/coding/v1
   supports_vision: true
 
+# Keep learning the user across sessions.
+# User-profile memory is cross-topic/cross-chat by design (personal preferences).
+# Project context is isolated per Telegram Topic via distinct session keys.
+memory:
+  memory_enabled: true
+  user_profile_enabled: true
+  write_approval: false
+  memory_char_limit: 2200
+  user_char_limit: 1375
+  nudge_interval: 10
+  flush_min_turns: 6
+
+# Do not auto-reset topic sessions; use /new or /reset inside a topic when a
+# project phase ends. This keeps project context alive across days.
+session_reset:
+  mode: none
+  idle_minutes: 1440
+  at_hour: 4
+
+# Group chats are isolated per participant; forum topics are shared among
+# participants in the same topic. Different topics still get different sessions.
+group_sessions_per_user: true
+thread_sessions_per_user: false
+
 toolsets:
   - kanban
 
@@ -32,10 +56,22 @@ agent:
   max_turns: 40
   reasoning_effort: medium
 
+# Notify when memory is updated so the user can spot wrong assumptions early.
+display:
+  memory_notifications: on
+
+platforms:
+  telegram:
+    extra:
+      # Hard-code Telegram fallback IPs to skip DNS-over-HTTPS discovery,
+      # which can hang on some networks. Keep this even after Hermes updates.
+      fallback_ips: "149.154.166.110,149.154.167.220"
+
 auxiliary:
   vision:
     provider: custom
     base_url: https://api.kimi.com/coding/v1
     model: kimi-k2.7-code
     timeout: 120
+    # Replace with the same KIMI key you put in this profile's .env
     api_key: __KIMI_API_KEY__
